@@ -1,0 +1,75 @@
+﻿@page "/calendar"
+@using System
+
+<h3>Kalendarz</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Pon</th>
+            <th>Wt</th>
+            <th>Śr</th>
+            <th>Czw</th>
+            <th>Pt</th>
+            <th>Sob</th>
+            <th>Ndz</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var week in WeeksInMonth)
+        {
+            <tr>
+                @foreach (var day in week)
+                {
+                    <td @onclick="(() => SelectDay(day))" class="@(IsSelected(day) ? "selected" : "")">@day.Day</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (SelectedDay != null)
+{
+    <p>Wybrany dzień: @SelectedDay.Value.ToShortDateString()</p>
+}
+
+@code {
+    private DateTime? SelectedDay { get; set; }
+    private List<List<DateTime>> WeeksInMonth { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        GenerateCalendar();
+    }
+
+    private void GenerateCalendar()
+    {
+        DateTime firstDayOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+        WeeksInMonth = new List<List<DateTime>>();
+        List<DateTime> currentWeek = new List<DateTime>();
+
+        for (DateTime date = firstDayOfMonth; date <= lastDayOfMonth; date = date.AddDays(1))
+        {
+            currentWeek.Add(date);
+
+            if (date.DayOfWeek == DayOfWeek.Sunday || date == lastDayOfMonth)
+            {
+                WeeksInMonth.Add(currentWeek);
+                currentWeek = new List<DateTime>();
+            }
+        }
+    }
+
+    private void SelectDay(DateTime day)
+    {
+        SelectedDay = day;
+    }
+
+    private bool IsSelected(DateTime day)
+    {
+        return SelectedDay.HasValue && SelectedDay.Value.Date == day.Date;
+    }
+}

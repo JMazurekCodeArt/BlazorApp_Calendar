@@ -1,0 +1,56 @@
+﻿@page "/appointment-window"
+@using BlazorApp1.Models
+@using Microsoft.AspNetCore.Components
+@inject AppointmentService appointmentService
+
+<h3>Okno Spotkania</h3>
+
+@if (Appointment != null)
+{
+    <form>
+        <div>
+            <label for="title">Tytuł:</label>
+            <input id="title" type="text" @bind="@Appointment.Title" />
+        </div>
+        <div>
+            <label for="date">Data:</label>
+            <input id="date" type="date" @bind="@Appointment.Date" />
+        </div>
+        <div>
+            <label for="description">Opis:</label>
+            <textarea id="description" @bind="@Appointment.Description"></textarea>
+        </div>
+
+        <div>
+            <button type="button" @onclick="SaveAppointment">Zapisz</button>
+            <button type="button" @onclick="DeleteAppointment">Usuń</button>
+        </div>
+    </form>
+}
+else
+{
+    <p>Brak wybranego spotkania.</p>
+}
+
+@code {
+    [Parameter]
+    public Appointment Appointment { get; set; }
+
+    private async Task SaveAppointment()
+    {
+        if (Appointment != null)
+        {
+            await appointmentService.SaveAppointment(Appointment);
+            // Możesz dodać dodatkową logikę po zapisaniu spotkania
+        }
+    }
+
+    private async Task DeleteAppointment()
+    {
+        if (Appointment != null)
+        {
+            await appointmentService.DeleteAppointment(Appointment);
+            // Możesz dodać dodatkową logikę po usunięciu spotkania
+        }
+    }
+}

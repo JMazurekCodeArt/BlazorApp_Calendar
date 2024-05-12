@@ -1,0 +1,51 @@
+﻿@using BlazorApp1.Services
+@using BlazorApp1.Models
+@using Microsoft.AspNetCore.Components
+@inject AppointmentService appointmentService
+
+<h3>Lista Spotkań</h3>
+
+@if (Appointments != null && Appointments.Any())
+{
+    <ul>
+        @foreach (var appointment in Appointments)
+        {
+            <li>
+                <div>
+                    <strong>@appointment.Title</strong>
+                    <span>@appointment.Date.ToShortDateString()</span>
+                </div>
+                <p>@appointment.Description</p>
+                <button @onclick="(() => DeleteAppointment(appointment))">Usuń</button>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Brak spotkań na wybrany dzień.</p>
+}
+
+@code {
+    [Parameter]
+    public DateTime SelectedDay { get; set; }
+
+    private List<Appointment> Appointments { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        LoadAppointments();
+    }
+
+    private void LoadAppointments()
+    {
+        Appointments = appointmentService.GetAppointmentsForDay(SelectedDay);
+    }
+
+    private async Task DeleteAppointment(Appointment appointment)
+    {
+        await appointmentService.DeleteAppointment(appointment);
+        LoadAppointments();
+    }
+}
